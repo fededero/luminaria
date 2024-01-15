@@ -20,6 +20,7 @@ void loop()
   access=true;
   int del=100;
   //warmColorsCycle(del);
+  //ultraWarmColorsCycle(del);
   allColorsCycle(del);
 }
 
@@ -28,6 +29,28 @@ void warmColorsCycle(int d)
 {
   uint8_t i;
   int diff=80;
+  while(access)
+  {
+    leds[0].r=MAX_C;
+    for(i=0;i<MAX_C-diff;i++)
+    {
+      leds[0].g=i;
+      FastLED.show();
+      delay(d);
+    }
+    for(i=MAX_C-diff;i<0;i--)
+    {
+      leds[0].g=i;
+      FastLED.show();
+      delay(d);
+    }
+  }
+}
+//cycles between red and yellow minus a larger difference 
+void ultraWarmColorsCycle(int d)
+{
+  uint8_t i;
+  int diff=140;
   while(access)
   {
     leds[0].r=MAX_C;
