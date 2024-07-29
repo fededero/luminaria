@@ -1,6 +1,3 @@
-#include <FastLED.h>
-
-#define NUM_LEDS 300
 #define ACTUAL_LEDS 180
 #define DATA_PIN 5
 
@@ -18,8 +15,13 @@ void loop()
 {
   access=true;
   int del=100;
+
+  
+  //pulse(10, 'r');
+  //strobe(50, CRGB::White);
+  pingPongFast(1, CRGB::Blue, 8);
   //warmColorsCycle(del);
-  ultraWarmColorsCycle(del);
+  //ultraWarmColorsCycle(del);
   //allColorsCycle(del);
   //randomColors(del);
 }
@@ -185,6 +187,118 @@ void randomColors(int del)
           break;
       }
     }
+    FastLED.show();
+    delay(del);
+  }
+}
+
+/*
+ *@brief Single bouncing light
+ *@param time between two frames, color of the light, lenght in number of LEDs
+ *
+*/
+void pingPongEffect(int del, CRGB color, int trail){
+  int position=1;
+  bool increasing=true;
+  while(access){
+    for (size_t i = 0; i < ACTUAL_LEDS; i++)
+    {
+      if(i<position || i>=position+trail)
+        leds[i] = CRGB::Black;
+      else 
+        leds[i] = color;
+    }
+    if(increasing==true){
+      position++;
+    }
+    else{
+      position--;
+    }
+    
+    if(position>ACTUAL_LEDS-trail)
+      increasing=false;
+    if(position==0)
+      increasing=true;
+
+    FastLED.show();
+    
+    //delay(del);
+  }
+  return;
+}
+
+void pingPongFast(int del, CRGB color, int trail){
+  int position=0;
+  bool increasing=true;
+  for (size_t i = 0; i < trail; i++)
+    {
+      leds[position+i]= color;
+    }
+  while(access){
+    if(increasing==true){
+      leds[position-1]=CRGB::Black;
+      leds[position+trail-1]=color;
+      position++;
+    }
+    if(increasing==false){
+      leds[position]=color;
+      leds[position+trail]=CRGB::Black;
+      position--;
+    }
+    
+    if(position>ACTUAL_LEDS-trail)
+      increasing=false;
+    if(position==0)
+      increasing=true;
+
+    FastLED.show();
+    
+    //delay(del);
+  }
+  return;
+}
+
+void strobe(int del, CRGB color){
+  bool on = false;
+
+  while(access){
+    if(on == false){
+      setCRGBColor(color);
+      on = true;
+    }
+    else{
+      setCRGBColor(CRGB::Black);
+      on = false;
+    }
+    FastLED.show();
+    delay(del);
+  }
+  return;
+}
+
+void setCRGBColor(CRGB color){
+
+  for(int i=0; i<ACTUAL_LEDS; i++){
+    leds[i]=color;
+  }
+  return;
+}
+
+void pulse(int del, char color){
+  int value=0;
+  bool inc=true;
+  while(access){
+    setColor(color, value);
+    if(inc==true)
+      value++;
+     else
+      value--;
+
+    if(value=0)
+      inc=true;
+     if(value=255)
+      inc=false;
+    
     FastLED.show();
     delay(del);
   }
